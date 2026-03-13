@@ -1,3 +1,3 @@
 # fish
 
-A fishing game for my website.
+A fishing game for my website
