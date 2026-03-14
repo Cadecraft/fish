@@ -51,18 +51,19 @@ body {
     }
 }
 
+.game {
+    /* Account for border width */
+    min-width: calc(var(--canvas-width) + 2px);
+    max-width: calc(var(--canvas-width) + 2px);
+    min-height: calc(var(--canvas-height) + 2px);
+    max-height: calc(var(--canvas-height) + 2px);
+    border: solid 1px var(--outline);
+}
+
 h1 {
     margin: 0px;
     font-size: 18px;
     font-weight: normal;
-}
-
-.game {
-    min-width: var(--canvas-width);
-    max-width: var(--canvas-width);
-    min-height: var(--canvas-height);
-    max-height: var(--canvas-height);
-    border: solid 1px var(--outline);
 }
 
 a, a:visited {
@@ -78,4 +79,8 @@ a:hover {
 
 a:focus-visible {
     outline: solid 2px var(--focus);
+}
+
+#canvas {
+    image-rendering: pixelated;
 }
