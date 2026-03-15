@@ -1,10 +1,16 @@
+"use strict";
+
 const runGame = () => {
     // Set up state
     const gameState = {
         /** 'home' | 'fishing' */
         status: 'home',
+        startTime: null,
         depth: 0,
-        lureX: 100
+        lureX: 100,
+        lureXglide: 110,
+        fishes: [],
+        nextSpawnTime: null,
     };
     const inputState = {
         keysDown: new Set(),
