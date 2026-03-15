@@ -2,6 +2,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
+ctx.font = "18px Datatype";
 
 const COLORS = {
     sky: "#85b4e2",
@@ -11,6 +12,7 @@ const COLORS = {
 
 const IMAGE_FILENAMES = {
     clouds: 'clouds.png',
+    land: 'land.png',
 };
 
 const imageCache = {};
@@ -33,7 +35,7 @@ const renderBg = (state, ctx) => {
 
     const skyHeight = 180;
 
-    if (state.depth < skyHeight) {
+    if (state.depth < skyHeight + imageCache.land.height * 2) {
         const waterLine = skyHeight - state.depth;
         ctx.fillStyle = COLORS.sky;
         ctx.fillRect(0, 0, GAME_WIDTH, waterLine);
@@ -41,7 +43,15 @@ const renderBg = (state, ctx) => {
         const animPercent = (Date.now() % 60000) / 60000;
         drawImageAt(ctx, imageCache.clouds, animPercent * GAME_WIDTH, -1 * state.depth, GAME_WIDTH, skyHeight);
         drawImageAt(ctx, imageCache.clouds, animPercent * GAME_WIDTH - GAME_WIDTH, -1 * state.depth, GAME_WIDTH, skyHeight);
+        // Land
+        drawImageAt(ctx, imageCache.land, 0, waterLine - 52, imageCache.land.width * 2, imageCache.land.height * 2);
     }
+}
+
+const renderUI = (state) => {
+    const depthMeters = Math.round(state.depth / 32);
+    const depthText = depthMeters <= 0 ? '' : `Depth: ${depthMeters}m`;
+    document.getElementById('depth').innerText = depthText;
 }
 
 const render = (state) => {
@@ -52,9 +62,9 @@ const render = (state) => {
 
     renderBg(state, ctx);
 
-    // TODO: render loop
-
     // Demo square
     ctx.fillStyle = COLORS.red;
     ctx.fillRect(state.x, state.x, 30, 30);
+
+    renderUI(state);
 }

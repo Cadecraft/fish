@@ -9,6 +9,7 @@ html {
     --bg: #dbdbd0;
     --outline: #adaba1;
     --text: #302d2c;
+    --text-ui: #dce1e8;
     --link: #3d79d3;
     --link-light: #6999e0;
     --focus: rgba(105, 153, 224, 0.5);
@@ -60,6 +61,8 @@ body {
     border: solid 1px var(--outline);
 
     background-color: #85b4e2;
+
+    position: relative;
 }
 
 h1 {
@@ -85,4 +88,14 @@ a:focus-visible {
 
 #canvas {
     image-rendering: pixelated;
+}
+
+#ui {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    padding: 6px 8px;
+    height: fit-content;
+    color: var(--text-ui);
 }
