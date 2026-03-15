@@ -2,29 +2,20 @@ const runGame = () => {
     // Set up state
     const gameState = {
         x: 10,
+        depth: 0,
     };
-
     const inputState = {
         keysDown: new Set(),
     };
 
     // Start helpers
     startInputListeners(inputState);
+    setupImages();
 
     // Game loop
     const gameLoop = (delta) => {
-        console.log('Game loop called with delta: ' + delta);
-
         render(gameState);
-
-        // TODO: take action on input
-        // TODO: refactor taking action on input
-        if (inputIsPressed(inputState, 'left')) {
-            console.log('movelf');
-            gameState.x -= 2;
-        } if (inputIsPressed(inputState, 'right')) {
-            gameState.x += 2;
-        }
+        updateState(gameState, inputState);
     }
 
     // Start rendering
@@ -40,7 +31,6 @@ const runGame = () => {
         renderState.lastTime = time;
         window.requestAnimationFrame(handleNextFrame);
     }
-
     window.requestAnimationFrame(handleNextFrame);
 }
 
