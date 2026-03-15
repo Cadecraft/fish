@@ -4,4 +4,5 @@ const GAME_HEIGHT = 540;
 const KEYS = {
     'left': 'a',
     'right': 'd',
+    'start': ' ',
 }

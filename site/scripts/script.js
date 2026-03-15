@@ -1,8 +1,10 @@
 const runGame = () => {
     // Set up state
     const gameState = {
-        x: 10,
+        /** 'home' | 'fishing' */
+        status: 'home',
         depth: 0,
+        lureX: 100
     };
     const inputState = {
         keysDown: new Set(),

@@ -1,15 +1,31 @@
 const inputIsPressed = (inputState, action) => {
-    return inputState.keysDown.has(KEYS[action])
+    return inputState.keysDown.has(KEYS[action]);
+}
+
+const unpressInput = (inputState, action) => {
+    inputState.keysDown.delete(KEYS[action]);
+}
+
+const handleInput = (gameState, inputState) => {
+    if (inputIsPressed(inputState, 'left')) {
+        gameState.lureX -= 8;
+    }
+    if (inputIsPressed(inputState, 'right')) {
+        gameState.lureX += 8;
+    }
+    if (inputIsPressed(inputState, 'start')) {
+        // TODO: more checks
+        if (gameState.status === 'home') {
+            gameState.status = 'fishing';
+            unpressInput(inputState, 'start')
+        }
+    }
 }
 
 const updateState = (gameState, inputState) => {
-    // TODO: take action on input
-    // TODO: refactor taking action on input
-    if (inputIsPressed(inputState, 'left')) {
-        gameState.x -= 2;
-        gameState.depth -= 4;
-    } if (inputIsPressed(inputState, 'right')) {
-        gameState.x += 2;
+    handleInput(gameState, inputState);
+
+    if (gameState.status === 'fishing') {
         gameState.depth += 4;
     }
 }
