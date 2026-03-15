@@ -6,3 +6,5 @@ const KEYS = {
     'right': 'd',
     'start': ' ',
 }
+
+const LURE_Y_OFFSET = 130;

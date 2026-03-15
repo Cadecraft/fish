@@ -8,10 +8,10 @@ const unpressInput = (inputState, action) => {
 
 const handleInput = (gameState, inputState) => {
     if (inputIsPressed(inputState, 'left')) {
-        gameState.lureX -= 8;
+        gameState.lureX = Math.max(8, gameState.lureX - 8);
     }
     if (inputIsPressed(inputState, 'right')) {
-        gameState.lureX += 8;
+        gameState.lureX = Math.min(GAME_WIDTH - 8, gameState.lureX + 8);
     }
     if (inputIsPressed(inputState, 'start')) {
         // TODO: more checks
@@ -26,6 +26,7 @@ const updateState = (gameState, inputState) => {
     handleInput(gameState, inputState);
 
     if (gameState.status === 'fishing') {
-        gameState.depth += 4;
+        const speed = Math.min(4, 1 + gameState.depth / 20);
+        gameState.depth += Math.max(speed);
     }
 }

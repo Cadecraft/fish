@@ -17,7 +17,12 @@ const IMAGE_FILENAMES = {
     fisherUnreleased1: 'fisher_unreleased1.png',
     fisherUnreleased2: 'fisher_unreleased2.png',
     fisher: 'fisher.png',
+    waves: 'waves.png',
+    waves2: 'waves2.png',
+    hook: 'hook.png',
 };
+
+const SKY_HEIGHT = 180;
 
 const imageCache = {};
 
@@ -41,22 +46,25 @@ const renderBg = (state, ctx) => {
     ctx.fillStyle = COLORS.water;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-    const skyHeight = 180;
-
-    if (state.depth < skyHeight + imageCache.land.height * 2) {
-        const waterLine = skyHeight - state.depth;
+    if (state.depth < SKY_HEIGHT + imageCache.land.height * 2) {
+        const waterLine = SKY_HEIGHT - state.depth;
         ctx.fillStyle = COLORS.sky;
-        ctx.fillRect(0, 0, GAME_WIDTH, waterLine);
+        ctx.fillRect(0, 0, GAME_WIDTH, Math.floor(waterLine));
         // Clouds
         const cloudAnimPercent = (Date.now() % 60000) / 60000;
         drawPixelArtAt(ctx, imageCache.clouds, cloudAnimPercent * GAME_WIDTH, -1 * state.depth);
         drawPixelArtAt(ctx, imageCache.clouds, cloudAnimPercent * GAME_WIDTH - GAME_WIDTH, -1 * state.depth);
+        const waveAnimPercent = (Date.now() % 120000) / 120000;
+        const waveAnimFrame = (Date.now() % 2500) < 1250;
+        const waveImage = waveAnimFrame ? imageCache.waves : imageCache.waves2;
+        drawPixelArtAt(ctx, waveImage, waveAnimPercent * GAME_WIDTH, waterLine - 6);
+        drawPixelArtAt(ctx, waveImage, waveAnimPercent * GAME_WIDTH - GAME_WIDTH, waterLine - 6);
         // Land
         drawPixelArtAt(ctx, imageCache.land, 0, waterLine - 52);
         // Fisher
         if (state.status === 'home') {
             const fisherAnimFrame = (Date.now() % 1000) < 500;
-            const fisherImage = fisherAnimFrame == 0 ? imageCache.fisherUnreleased1 : imageCache.fisherUnreleased2;
+            const fisherImage = fisherAnimFrame ? imageCache.fisherUnreleased1 : imageCache.fisherUnreleased2;
             drawPixelArtAt(ctx, fisherImage, 84, waterLine - 138);
         } else {
             drawPixelArtAt(ctx, imageCache.fisher, 84, waterLine - 138);
@@ -69,12 +77,23 @@ const renderBg = (state, ctx) => {
     }
 }
 
+const renderLure = (state, ctx) => {
+    const waterLine = SKY_HEIGHT - state.depth;
+    const stringTop = Math.max(waterLine, 0);
+    const lureY = Math.max(waterLine, LURE_Y_OFFSET);
+    ctx.strokeStyle = COLORS.line;
+    ctx.beginPath();
+    ctx.moveTo(state.lureX, stringTop);
+    ctx.lineTo(state.lureX, lureY);
+    ctx.stroke();
+    drawPixelArtAt(ctx, imageCache.hook, state.lureX - 18, lureY);
+}
+
 // UI definitions
 const uiDepth = document.getElementById('depth');
 const uiHint = document.getElementById('hint');
 
 const renderUI = (state) => {
-
     const depthMeters = Math.round(state.depth / 32);
     const depthText = depthMeters <= 0 ? '' : `Depth: ${depthMeters}m`;
     uiDepth.innerText = depthText;
@@ -95,10 +114,10 @@ const render = (state) => {
     const animationMs = Date.now();
 
     renderBg(state, ctx);
-
-    // Demo square
-    ctx.fillStyle = COLORS.red;
-    ctx.fillRect(state.x, state.x, 30, 30);
+    
+    if (state.status === 'fishing') {
+        renderLure(state, ctx);
+    }
 
     renderUI(state);
 }
