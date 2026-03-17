@@ -9,6 +9,7 @@ ctx.font = "18px Datatype";
 const COLORS = {
     sky: "#85b4e2",
     water: "#4065bd",
+    deepSea: "#0a0b23",
     red: "red",
     line: "#c5d1db",
 };
@@ -52,16 +53,21 @@ const drawPixelArtAt = (ctx, image, x, y) => {
 }
 
 const renderBg = (state, ctx) => {
-    ctx.fillStyle = COLORS.water;
+    ctx.fillStyle = COLORS.deepSea;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     // Sea (always)
     const seaScrollHeight = -1 * (state.depth) % GAME_HEIGHT;
     const seaOffset = state.status === 'home' ? -1 * (Date.now() % 2000) / 1000 : 0;
+    ctx.globalAlpha = Math.min(1, Math.max(0, 1 - (state.depth - 800) / 5000));
+    ctx.fillStyle = COLORS.water;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     drawPixelArtAt(ctx, imageCache.seabg, 0, seaScrollHeight + seaOffset);
     drawPixelArtAt(ctx, imageCache.seabg, 0, seaScrollHeight + seaOffset + GAME_HEIGHT);
+    ctx.globalAlpha = 1;
 
-    if (state.depth < SKY_HEIGHT + imageCache.land.height * 2) {
+    const homeVisible = state.depth < SKY_HEIGHT + imageCache.land.height * 2;
+    if (homeVisible) {
         const waterLine = SKY_HEIGHT - state.depth;
         ctx.fillStyle = COLORS.sky;
         ctx.fillRect(0, 0, GAME_WIDTH, Math.floor(waterLine));
@@ -111,7 +117,7 @@ const renderFish = (state, ctx) => {
 
         if (fish.taken) {
             const imageId = `fish_${fish.type}`;
-            const renderX = state.lureX + FISHES[fish.type].width / 2 - 8;
+            const renderX = state.lureX + FISHES[fish.type].height / 2 - 8;
             const renderY = LURE_Y_OFFSET + 12;
             ctx.save();
             ctx.translate(renderX, renderY);

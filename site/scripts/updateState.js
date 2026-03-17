@@ -32,12 +32,17 @@ const handleInput = (gameState, inputState, delta) => {
     }
 }
 
-const spawnFish = (gameState, fishType) => {
+const spawnFish = (gameState) => {
+    // TODO: better RNG/fish generation
+    const fishType = Object.keys(FISHES)[Math.floor(Math.random() * Object.keys(FISHES).length)]
+    console.log(fishType);
+    const x = Math.random() * GAME_WIDTH;
+    const dir = Math.floor(Math.random() * 2) === 0 ? -1 : 1;
     gameState.fishes.push({
         type: fishType,
-        x: 100,
+        x,
         depth: gameState.depth + GAME_HEIGHT,
-        direction: -1,
+        direction: dir,
         taken: false,
     });
 }
@@ -83,8 +88,8 @@ const updateState = (gameState, inputState, delta) => {
         gameState.depth += sinkSpeedAdjusted;
 
         if (Date.now() > gameState.nextSpawnTime) {
-            spawnFish(gameState, 'silver');
-            gameState.nextSpawnTime = Date.now() + 100;
+            spawnFish(gameState);
+            gameState.nextSpawnTime = Date.now() + 300;
             cullFishes(gameState);
         }
     }
