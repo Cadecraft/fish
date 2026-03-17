@@ -33,6 +33,7 @@ const setupImages = () => {
     for (const fishName of Object.keys(FISHES)) {
         const fishId = `fish_${fishName}`;
         IMAGE_FILENAMES[fishId] = `${fishId}.png`;
+        IMAGE_FILENAMES[`${fishId}_right`] = `${fishId}_right.png`;
     }
 
     for (const [key, filename] of Object.entries(IMAGE_FILENAMES)) {
@@ -104,9 +105,28 @@ const renderLure = (state, ctx) => {
 }
 
 const renderFish = (state, ctx) => {
-    for (const fish of state.fishes) {
-        drawPixelArtAt(ctx, imageCache[`fish_${fish.type}`], fish.x, fish.depth - state.depth);
-    }
+    state.fishes.forEach((fish) => {
+        const visible = fish.taken || fish.depth > state.depth - LURE_Y_OFFSET && fish.depth < state.depth + GAME_HEIGHT;
+        if (!visible) return;
+
+        if (fish.taken) {
+            const imageId = `fish_${fish.type}`;
+            const renderX = state.lureX + FISHES[fish.type].width / 2 - 8;
+            const renderY = LURE_Y_OFFSET + 12;
+            ctx.save();
+            ctx.translate(renderX, renderY);
+            ctx.rotate((80 + Math.random() * 20) * Math.PI / 180);
+            drawPixelArtAt(ctx, imageCache[imageId], 0, 0);
+            ctx.restore();
+        } else {
+            const facingRight = fish.direction > 0;
+            const imageId = `fish_${fish.type}${facingRight ? '_right' : ''}`;
+            const renderX = fish.x - FISHES[fish.type].width / 2;
+            const renderY = fish.depth - state.depth + LURE_Y_OFFSET - FISHES[fish.type].height / 2;
+            drawPixelArtAt(ctx, imageCache[imageId], renderX, renderY);
+        }
+
+    });
 }
 
 // UI definitions
@@ -120,7 +140,7 @@ const renderUI = (state) => {
 
     if (state.status === 'home') {
         uiHint.innerText = '[space] start';
-    } else if (state.status === 'fishing' && depthMeters > 5 && depthMeters < 30) {
+    } else if (state.status === 'descending' && depthMeters > 5 && depthMeters < 30) {
         uiHint.innerText = '[a] left, [d] right';
     } else {
         uiHint.innerText = '';
@@ -135,7 +155,7 @@ const render = (state) => {
 
     renderBg(state, ctx);
     
-    if (state.status === 'fishing') {
+    if (state.status === 'descending' || state.status === 'ascending') {
         renderLure(state, ctx);
     }
 

@@ -11,7 +11,9 @@ const KEYS = {
 
 const FISHES = {
     'silver': {
-        speed: 8,
+        speed: 0.2,
+        width: 32,
+        height: 32
     },
 };
 

@@ -3,7 +3,7 @@
 const runGame = () => {
     // Set up state
     const gameState = {
-        /** 'home' | 'fishing' */
+        /** 'home' | 'descending' | 'ascending' */
         status: 'home',
         startTime: null,
         depth: 0,
@@ -23,7 +23,7 @@ const runGame = () => {
     // Game loop
     const gameLoop = (delta) => {
         render(gameState);
-        updateState(gameState, inputState);
+        updateState(gameState, inputState, delta);
     }
 
     // Start rendering
