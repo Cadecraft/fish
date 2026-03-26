@@ -13,29 +13,9 @@ const startFishing = (gameState) => {
     gameState.startTime = Date.now();
 }
 
-const handleInput = (gameState, inputState, delta) => {
-    // TODO: handle based on the DELTA
-    const accel = delta * 0.6;
-    if (gameState.status === 'ascending' || gameState.status === 'descending') {
-        if (inputIsPressed(inputState, 'left')) {
-            gameState.lureX = Math.max(8, gameState.lureX - accel);
-        }
-        if (inputIsPressed(inputState, 'right')) {
-            gameState.lureX = Math.min(GAME_WIDTH - 8, gameState.lureX + accel);
-        }
-    } else if (gameState.status === 'home') {
-        if (inputIsPressed(inputState, 'start')) {
-            // TODO: more checks
-            startFishing(gameState);
-            unpressInput(inputState, 'start')
-        }
-    }
-}
-
 const spawnFish = (gameState) => {
     // TODO: better RNG/fish generation
     const fishType = Object.keys(FISHES)[Math.floor(Math.random() * Object.keys(FISHES).length)]
-    console.log(fishType);
     const x = Math.random() * GAME_WIDTH;
     const dir = Math.floor(Math.random() * 2) === 0 ? -1 : 1;
     gameState.fishes.push({
@@ -72,10 +52,48 @@ const calcCollisions = (gameState) => {
         }
         const inXRange = gameState.lureX > fish.x - xMargin - FISHES[fish.type].width / 2 && gameState.lureX < fish.x + xMargin + FISHES[fish.type].width / 2;
         if (inXRange) {
-            console.log('collided');
             handleFishCollision(gameState, fish);
         }
     });
+}
+
+const endGame = (gameState) => {
+    const fishTypeCounts = {};
+    const fishTypesCaught = gameState.fishes.filter(f => f.taken).map(f => f.type);
+    fishTypesCaught.forEach(t => { fishTypeCounts[t] = (fishTypeCounts[t] ?? 0) + 1; });
+    const results = {
+        fishTypeCounts
+    };
+    const lastGame = { ...gameState, results, lastGame: null };
+    const newGameState = {
+        ...structuredClone(DEFAULT_GAME_STATE),
+        status: 'results',
+        lastGame
+    };
+    Object.assign(gameState, newGameState);
+    console.log('[dbg] ended game, new state: ' + JSON.stringify(gameState));
+}
+
+const handleInput = (gameState, inputState, delta) => {
+    const accel = delta * 0.6;
+    if (gameState.status === 'ascending' || gameState.status === 'descending') {
+        if (inputIsPressed(inputState, 'left')) {
+            gameState.lureX = Math.max(8, gameState.lureX - accel);
+        }
+        if (inputIsPressed(inputState, 'right')) {
+            gameState.lureX = Math.min(GAME_WIDTH - 8, gameState.lureX + accel);
+        }
+    } else if (gameState.status === 'home') {
+        if (inputIsPressed(inputState, 'start')) {
+            startFishing(gameState);
+            unpressInput(inputState, 'start')
+        }
+    } else if (gameState.status === 'results') {
+        if (inputIsPressed(inputState, 'start')) {
+            gameState.status = 'home';
+            unpressInput(inputState, 'start')
+        }
+    }
 }
 
 const updateState = (gameState, inputState, delta) => {
@@ -101,8 +119,7 @@ const updateState = (gameState, inputState, delta) => {
 
         if (gameState.depth < 0) {
             // TODO: end game, reset state
-            gameState.depth = 0;
-            gameState.status = 'home';
+            endGame(gameState);
         }
     }
 

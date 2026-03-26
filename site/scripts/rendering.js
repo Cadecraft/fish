@@ -56,9 +56,11 @@ const renderBg = (state, ctx) => {
     ctx.fillStyle = COLORS.deepSea;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
+    const atSurface = state.status === 'home' || state.status === 'results';
+
     // Sea (always)
     const seaScrollHeight = -1 * (state.depth) % GAME_HEIGHT;
-    const seaOffset = state.status === 'home' ? -1 * (Date.now() % 2000) / 1000 : 0;
+    const seaOffset = atSurface ? -1 * (Date.now() % 2000) / 1000 : 0;
     ctx.globalAlpha = Math.min(1, Math.max(0, 1 - (state.depth - 800) / 5000));
     ctx.fillStyle = COLORS.water;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
@@ -83,7 +85,7 @@ const renderBg = (state, ctx) => {
         // Land
         drawPixelArtAt(ctx, imageCache.land, 0, waterLine - 52);
         // Fisher
-        if (state.status === 'home') {
+        if (atSurface) {
             const fisherAnimFrame = (Date.now() % 1000) < 500;
             const fisherImage = fisherAnimFrame ? imageCache.fisherUnreleased1 : imageCache.fisherUnreleased2;
             drawPixelArtAt(ctx, fisherImage, 84, waterLine - 138);
@@ -138,16 +140,59 @@ const renderFish = (state, ctx) => {
 // UI definitions
 const uiDepth = document.getElementById('depth');
 const uiHint = document.getElementById('hint');
+const uiResults = document.getElementById('results');
+const uiFishlist = document.getElementById('fishlist');
+const uiShare = document.getElementById('share');
+
+const renderUIFishlist = (state) => {
+    const fishTypeCounts = state.lastGame.results.fishTypeCounts;
+    // TODO: memoize this so it only happens once (update in state)
+    while (uiFishlist.firstChild) {
+        uiFishlist.removeChild(uiFishlist.lastChild);
+    }
+    Object.entries(fishTypeCounts).forEach(([type, count]) => {
+        const fishCell = document.createElement('div');
+        fishCell.className = 'fishcell';
+        const fishImg = document.createElement('img');
+        fishImg.src = `assets/textures/fish_${type}.png`;
+        fishCell.appendChild(fishImg);
+        const fishDescr = document.createElement('span');
+        fishDescr.innerText = `x${count}`;
+        fishCell.appendChild(fishDescr);
+        uiFishlist.appendChild(fishCell);
+    });
+}
+
+const generateShareOnclick = (state) => {
+    return () => {
+        const toShowFish = state.lastGame.results.fishTypeCounts;
+        const gameUrl = window.location.href;
+        const shareText = `My results for ${gameUrl}\n` + Object.entries(toShowFish).map(([type, count]) => `🐟 ${type} x${count}\n`).reduce((a, b) => a + b);
+        navigator.clipboard.writeText(shareText);
+        uiShare.innerText = 'Copied!';
+    };
+}
 
 const renderUI = (state) => {
     const depthMeters = Math.round(state.depth / 32);
     const depthText = depthMeters <= 0 ? '' : `Depth: ${depthMeters}m`;
     uiDepth.innerText = depthText;
 
+    if (state.status !== 'results') {
+        uiResults.style.display = 'none';
+    }
+
     if (state.status === 'home') {
         uiHint.innerText = '[space] start';
     } else if (state.status === 'descending' && depthMeters > 5 && depthMeters < 30) {
         uiHint.innerText = '[a] left, [d] right';
+    } else if (state.status === 'results') {
+        uiHint.innerText = '[space] close';
+        uiResults.style.display = 'flex';
+        renderUIFishlist(state);
+        // TODO: also memoize this so it only happens once
+        // Override existing onclick
+        uiShare.onclick = generateShareOnclick(state);
     } else {
         uiHint.innerText = '';
     }

@@ -33,3 +33,5 @@ const FISHES = {
 };
 
 const LURE_Y_OFFSET = 130;
+
+const USE_DEBUG_SETUP = false;

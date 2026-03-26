@@ -16,6 +16,9 @@ html {
 
     --canvas-width: 330px;
     --canvas-height: 540px;
+
+    --brown-wood: #54473f;
+    --brown-wood-outline: #63594e;
 }
 
 * {
@@ -105,5 +108,61 @@ a:focus-visible {
 
     #hint {
         padding-bottom: 20px;
+    }
+
+    #results {
+        height: 320px;
+        width: 220px;
+        background-color: var(--brown-wood);
+        border: solid 1px var(--outline);
+        margin-bottom: 80px;
+        padding: 6px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .separated {
+            flex-grow: 1;
+            overflow: scroll;
+        }
+
+        #fishlist {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .fishcell {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: solid 1px var(--brown-wood-outline);
+
+            img {
+                height: 32px;
+                width: 32px;
+                object-fit: contain;
+                image-rendering: pixelated;
+            }
+        }
+
+        .result-buttons {
+            display: flex;
+            button {
+                margin-left: auto;
+                font-family: inherit;
+                font-size: inherit;
+                border: none;
+                background-color: var(--brown-wood-outline);
+                border: solid 1px var(--outline);
+                color: var(--text-ui);
+
+                &:hover {
+                    background-color: var(--brown-wood);
+                    cursor: pointer;
+                }
+            }
+        }
     }
 }
