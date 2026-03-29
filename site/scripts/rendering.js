@@ -52,14 +52,24 @@ const drawPixelArtAt = (ctx, image, x, y) => {
     ctx.drawImage(image, Math.floor(x), Math.floor(y), Math.ceil(image.width * 2), Math.ceil(image.height * 2));
 }
 
+const getAscendingOffset = (state) => {
+    const fromTop = Math.min(Math.max(0, state.depth), 200);
+    const fromBottomRaw = 0.5 * (state.maxDepth - state.depth);
+    const fromBottomRawUnit = Math.max(0, Math.min(1, fromBottomRaw / 200));
+    const fromBottomSmoothed = Math.sin(Math.PI * (fromBottomRawUnit - 0.5)) / 2 + 0.5;
+    const fromBottom = fromBottomSmoothed * 200;
+    return state.status === 'ascending' ? Math.min(fromTop, fromBottom) : 0;
+}
+
 const renderBg = (state, ctx) => {
     ctx.fillStyle = COLORS.deepSea;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     const atSurface = state.status === 'home' || state.status === 'results';
+    const ascendingOffset = getAscendingOffset(state);
 
     // Sea (always)
-    const seaScrollHeight = -1 * (state.depth) % GAME_HEIGHT;
+    const seaScrollHeight = -1 * (state.depth - ascendingOffset) % GAME_HEIGHT;
     const seaOffset = atSurface ? -1 * (Date.now() % 2000) / 1000 : 0;
     ctx.globalAlpha = Math.min(1, Math.max(0, 1 - (state.depth - 800) / 5000));
     ctx.fillStyle = COLORS.water;
@@ -70,13 +80,14 @@ const renderBg = (state, ctx) => {
 
     const homeVisible = state.depth < SKY_HEIGHT + imageCache.land.height * 2;
     if (homeVisible) {
-        const waterLine = SKY_HEIGHT - state.depth;
+        const waterLine = SKY_HEIGHT - state.depth + ascendingOffset;
         ctx.fillStyle = COLORS.sky;
         ctx.fillRect(0, 0, GAME_WIDTH, Math.floor(waterLine));
         // Clouds
         const cloudAnimPercent = (Date.now() % 60000) / 60000;
-        drawPixelArtAt(ctx, imageCache.clouds, cloudAnimPercent * GAME_WIDTH, -1 * state.depth);
-        drawPixelArtAt(ctx, imageCache.clouds, cloudAnimPercent * GAME_WIDTH - GAME_WIDTH, -1 * state.depth);
+        const cloudY = -1 * state.depth + ascendingOffset;
+        drawPixelArtAt(ctx, imageCache.clouds, cloudAnimPercent * GAME_WIDTH, cloudY);
+        drawPixelArtAt(ctx, imageCache.clouds, cloudAnimPercent * GAME_WIDTH - GAME_WIDTH, cloudY);
         const waveAnimPercent = (Date.now() % 120000) / 120000;
         const waveAnimFrame = (Date.now() % 2500) < 1250;
         const waveImage = waveAnimFrame ? imageCache.waves : imageCache.waves2;
@@ -101,9 +112,10 @@ const renderBg = (state, ctx) => {
 }
 
 const renderLure = (state, ctx) => {
-    const waterLine = SKY_HEIGHT - state.depth;
+    const ascendingOffset = getAscendingOffset(state);
+    const waterLine = SKY_HEIGHT - state.depth + ascendingOffset;
     const stringTop = Math.max(waterLine, 0);
-    const lureY = Math.max(waterLine, LURE_Y_OFFSET);
+    const lureY = Math.max(waterLine, LURE_Y_OFFSET + ascendingOffset);
     ctx.strokeStyle = COLORS.line;
     ctx.beginPath();
     ctx.moveTo(state.lureXglide, stringTop);
@@ -113,14 +125,16 @@ const renderLure = (state, ctx) => {
 }
 
 const renderFish = (state, ctx) => {
+    const ascendingOffset = getAscendingOffset(state);
+    const lureYOffset = LURE_Y_OFFSET + ascendingOffset;
     state.fishes.forEach((fish) => {
-        const visible = fish.taken || fish.depth > state.depth - LURE_Y_OFFSET && fish.depth < state.depth + GAME_HEIGHT;
+        const visible = fish.taken || fish.depth > state.depth - lureYOffset && fish.depth < state.depth + GAME_HEIGHT + ascendingOffset;
         if (!visible) return;
 
         if (fish.taken) {
             const imageId = `fish_${fish.type}`;
             const renderX = state.lureX + FISHES[fish.type].height / 2 - 8;
-            const renderY = LURE_Y_OFFSET + 12;
+            const renderY = lureYOffset + 12;
             ctx.save();
             ctx.translate(renderX, renderY);
             ctx.rotate((80 + Math.random() * 20) * Math.PI / 180);
@@ -130,7 +144,7 @@ const renderFish = (state, ctx) => {
             const facingRight = fish.direction > 0;
             const imageId = `fish_${fish.type}${facingRight ? '_right' : ''}`;
             const renderX = fish.x - FISHES[fish.type].width / 2;
-            const renderY = fish.depth - state.depth + LURE_Y_OFFSET - FISHES[fish.type].height / 2;
+            const renderY = fish.depth - state.depth + lureYOffset - FISHES[fish.type].height / 2;
             drawPixelArtAt(ctx, imageCache[imageId], renderX, renderY);
         }
 

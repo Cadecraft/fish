@@ -104,6 +104,7 @@ const updateState = (gameState, inputState, delta) => {
         const sinkSpeedRaw = Math.min(0.3, 0.1 + gameState.depth / 300);
         const sinkSpeedAdjusted = delta * sinkSpeedRaw;
         gameState.depth += sinkSpeedAdjusted;
+        gameState.maxDepth = gameState.depth;
 
         if (Date.now() > gameState.nextSpawnTime) {
             spawnFish(gameState);

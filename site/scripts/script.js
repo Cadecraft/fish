@@ -5,6 +5,7 @@ const DEFAULT_GAME_STATE = {
     status: 'home',
     startTime: null,
     depth: 0,
+    maxDepth: 0,
     lureX: 100,
     lureXglide: 110,
     fishes: [],
