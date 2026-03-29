@@ -2,11 +2,13 @@
 
 const GAME_WIDTH = 330;
 const GAME_HEIGHT = 540;
-/** Maps game action identifiers to the keys that trigger them */
+/** Maps keys to the game action identifiers that they trigger */
 const KEYS = {
-    'left': 'a',
-    'right': 'd',
-    'start': ' ',
+    'a': 'left',
+    'd': 'right',
+    'ArrowLeft': 'left',
+    'ArrowRight': 'right',
+    ' ': 'start',
 };
 
 const FISHES = {

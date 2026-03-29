@@ -1,11 +1,11 @@
 "use strict";
 
 const inputIsPressed = (inputState, action) => {
-    return inputState.keysDown.has(KEYS[action]);
+    return inputState.keysDown.has(action);
 }
 
 const unpressInput = (inputState, action) => {
-    inputState.keysDown.delete(KEYS[action]);
+    inputState.keysDown.delete(action);
 }
 
 const startFishing = (gameState) => {

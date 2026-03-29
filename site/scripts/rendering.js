@@ -200,11 +200,11 @@ const renderUI = (state) => {
     }
 
     if (state.status === 'home') {
-        uiHint.innerText = '[space] start';
+        uiHint.innerText = '[space/tap] start';
     } else if (state.status === 'descending' && depthMeters > 5 && depthMeters < 30) {
         uiHint.innerText = '[a] left, [d] right';
     } else if (state.status === 'results') {
-        uiHint.innerText = '[space] close';
+        uiHint.innerText = '[space/tap] close';
         uiResults.style.display = 'flex';
         renderUIFishlist(state);
         // TODO: also memoize this so it only happens once
