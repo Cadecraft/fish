@@ -75,7 +75,9 @@ const endGame = (gameState) => {
         lastGame
     };
     Object.assign(gameState, newGameState);
-    console.log('[dbg] ended game, new state: ' + JSON.stringify(gameState));
+    if (USE_DEBUG_SETUP) {
+        console.log('[dbg] ended game, new state: ' + JSON.stringify(gameState));
+    }
 }
 
 const handleInput = (gameState, inputState, delta) => {
