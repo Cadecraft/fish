@@ -15,7 +15,11 @@ const startFishing = (gameState) => {
 
 const spawnFish = (gameState) => {
     // TODO: better RNG/fish generation
-    const fishType = Object.keys(FISHES)[Math.floor(Math.random() * Object.keys(FISHES).length)]
+    const validFishTypes = Object.fromEntries(Object.entries(FISHES).filter(([_, f]) => (
+        gameState.depth >= f.spawnDepthMin && (!f.spawnDepthMax || gameState.depth <= f.spawnDepthMax)
+    )));
+
+    const fishType = Object.keys(validFishTypes)[Math.floor(Math.random() * Object.keys(validFishTypes).length)]
     const x = Math.random() * GAME_WIDTH;
     const dir = Math.floor(Math.random() * 2) === 0 ? -1 : 1;
     gameState.fishes.push({
@@ -119,7 +123,6 @@ const updateState = (gameState, inputState, delta) => {
         gameState.depth -= riseSpeedAdjusted;
 
         if (gameState.depth < 0) {
-            // TODO: end game, reset state
             endGame(gameState);
         }
     }

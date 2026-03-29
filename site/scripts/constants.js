@@ -13,23 +13,52 @@ const FISHES = {
     'silver': {
         speed: 0.2,
         width: 32,
-        height: 32
+        height: 32,
+        spawnDepthMin: 0,
+        spawnDepthMax: 4000,
     },
     'orange': {
         speed: 0.1,
         width: 64,
-        height: 32
+        height: 32,
+        spawnDepthMin: 0,
+        spawnDepthMax: 1000,
     },
     'ghost': {
         speed: 0.3,
         width: 40,
-        height: 32
+        height: 32,
+        spawnDepthMin: 800,
+        spawnDepthMax: 1800,
     },
     'purple': {
         speed: 0.2,
         width: 32,
         height: 32,
-    }
+        spawnDepthMin: 600,
+        spawnDepthMax: 2000,
+    },
+    'longfish': {
+        speed: 0.2,
+        width: 80,
+        height: 18,
+        spawnDepthMin: 1800,
+        spawnDepthMax: undefined,
+    },
+    'rock': {
+        speed: 0.03,
+        width: 32,
+        height: 32,
+        spawnDepthMin: 2000,
+        spawnDepthMax: undefined,
+    },
+    'gold': {
+        speed: 0.3,
+        width: 32,
+        height: 32,
+        spawnDepthMin: 1400,
+        spawnDepthMax: undefined,
+    },
 };
 
 const LURE_Y_OFFSET = 130;
