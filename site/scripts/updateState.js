@@ -111,8 +111,9 @@ const updateState = (gameState, inputState, delta) => {
         gameState.maxDepth = gameState.depth;
 
         if (Date.now() > gameState.nextSpawnTime) {
+            const delay = Math.random() * 150 + 220;
             spawnFish(gameState);
-            gameState.nextSpawnTime = Date.now() + 300;
+            gameState.nextSpawnTime = Date.now() + delay;
             cullFishes(gameState);
         }
     }

@@ -53,12 +53,15 @@ const drawPixelArtAt = (ctx, image, x, y) => {
 }
 
 const getAscendingOffset = (state) => {
+    if (state.status !== 'ascending') {
+        return 0;
+    }
     const fromTop = Math.min(Math.max(0, state.depth), 200);
     const fromBottomRaw = 0.5 * (state.maxDepth - state.depth);
     const fromBottomRawUnit = Math.max(0, Math.min(1, fromBottomRaw / 200));
     const fromBottomSmoothed = Math.sin(Math.PI * (fromBottomRawUnit - 0.5)) / 2 + 0.5;
     const fromBottom = fromBottomSmoothed * 200;
-    return state.status === 'ascending' ? Math.min(fromTop, fromBottom) : 0;
+    return Math.min(fromTop, fromBottom);
 }
 
 const renderBg = (state, ctx) => {
@@ -128,7 +131,7 @@ const renderFish = (state, ctx) => {
     const ascendingOffset = getAscendingOffset(state);
     const lureYOffset = LURE_Y_OFFSET + ascendingOffset;
     state.fishes.forEach((fish) => {
-        const visible = fish.taken || fish.depth > state.depth - lureYOffset && fish.depth < state.depth + GAME_HEIGHT + ascendingOffset;
+        const visible = fish.taken || fish.depth > state.depth - lureYOffset && fish.depth < state.depth + GAME_HEIGHT - ascendingOffset;
         if (!visible) return;
 
         if (fish.taken) {
