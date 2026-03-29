@@ -1,0 +1,4 @@
+root: ./
+
+# Fall back to index.html for unmatched routes
+index_fallback: true
